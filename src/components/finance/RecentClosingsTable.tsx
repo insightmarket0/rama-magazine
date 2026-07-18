@@ -40,39 +40,43 @@ export const RecentClosingsTable = ({
     const sortedData = [...data].sort((a, b) => b.month.localeCompare(a.month));
 
     return (
-        <Card className="bg-[#0A0A0A] border-[#1F1F1F] shadow-lg rounded-xl overflow-hidden">
-            <CardHeader className="border-b border-[#1F1F1F]">
-                <CardTitle className="text-xl font-bold text-white">Lançamentos Recentes</CardTitle>
-            </CardHeader>
-            <CardContent className="p-0">
+        <Card className="bg-[#111111] border border-white/5 shadow-2xl rounded-2xl overflow-hidden relative">
+            <CardHeader className="border-b border-white/5 px-6 pt-6 pb-4">
+                <CardTitle className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-0">Lançamentos Recentes</CardTitle>
+      </CardHeader>
+      <CardContent className="p-0">
                 <Table>
-                    <TableHeader className="bg-[#121212]">
-                        <TableRow className="border-[#1F1F1F] hover:bg-[#121212]">
-                            <TableHead className="text-gray-400 font-medium">Mês/Ano</TableHead>
+                    <TableHeader className="bg-white/[0.02]">
+                        <TableRow className="border-white/5 hover:bg-transparent">
+                            <TableHead className="text-gray-400 font-medium w-[120px]">Mês/Ano</TableHead>
                             {/* Dynamic Headers */}
                             {marketplaces.map(m => (
-                                <TableHead key={m.id} className="text-gray-400 font-medium">{m.label}</TableHead>
+                                <TableHead key={m.id} className="text-right text-gray-400 font-medium">{m.label}</TableHead>
                             ))}
-                            <TableHead className="text-gray-200 font-bold">Total Geral</TableHead>
-                            <TableHead className="text-right text-gray-400">Ações</TableHead>
+                            <TableHead className="text-right text-[#00FF00] font-bold uppercase text-[10px] tracking-wider">Lucro Líquido</TableHead>
+                            <TableHead className="text-right text-[#00FF00] font-bold uppercase text-[10px] tracking-wider">Total Geral</TableHead>
+                            <TableHead className="text-right text-gray-500 uppercase text-[10px] tracking-wider">Ações</TableHead>
                         </TableRow>
                     </TableHeader>
                     <TableBody>
                         {sortedData.map((row) => (
-                            <TableRow key={row.id} className="border-[#1F1F1F] hover:bg-[#121212]/50 transition-colors">
-                                <TableCell className="capitalize text-gray-300 font-medium">
+                            <TableRow key={row.id} className="border-white/5 hover:bg-white/5 transition-colors">
+                                <TableCell className="font-medium text-white capitalize">
                                     {format(parseISO(row.month + "-01"), "MMMM/yyyy", {
                                         locale: ptBR,
                                     })}
                                 </TableCell>
-                                {/* Dynamic Cells */}
-                                {marketplaces.map(m => (
-                                    <TableCell key={m.id} className="text-gray-400">
-                                        {formatCurrency(Number(row.revenues?.[m.id] || 0))}
+                                {marketplaces.map(market => (
+                                    <TableCell key={`td-${row.id}-${market.id}`} className="text-right text-gray-300">
+                                        {formatCurrency(Number(row.revenues?.[market.id] || 0))}
                                     </TableCell>
                                 ))}
-
-                                <TableCell className="font-bold text-green-500">{formatCurrency(row.total)}</TableCell>
+                                <TableCell className="text-right text-[#00FF00] font-bold bg-[#00FF00]/10">
+                                    {formatCurrency(row.netProfit || 0)}
+                                </TableCell>
+                                <TableCell className="text-right text-[#00FF00] font-extrabold bg-[#00FF00]/5">
+                                    {formatCurrency(row.total)}
+                                </TableCell>
                                 <TableCell className="text-right">
                                     {isAdmin && (
                                         <div className="flex justify-end gap-2">
@@ -98,8 +102,8 @@ export const RecentClosingsTable = ({
                             </TableRow>
                         ))}
                         {sortedData.length === 0 && (
-                            <TableRow className="border-[#1F1F1F]">
-                                <TableCell colSpan={marketplaces.length + 3} className="h-24 text-center text-gray-500">
+                            <TableRow className="border-white/5 hover:bg-transparent">
+                                <TableCell colSpan={marketplaces.length + 4} className="h-24 text-center text-gray-500">
                                     Nenhum fechamento registrado.
                                 </TableCell>
                             </TableRow>

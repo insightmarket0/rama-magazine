@@ -44,6 +44,7 @@ export const ClosingFormDialog = ({
     const formSchema = useMemo(() => {
         const fields: Record<string, any> = {
             month: z.string().regex(/^\d{4}-\d{2}$/, "Formato inválido (AAAA-MM)"),
+            netProfit: z.coerce.number().min(0, "Valor deve ser positivo"),
         };
 
         // Add validation for each active marketplace
@@ -67,6 +68,7 @@ export const ClosingFormDialog = ({
                 // Map revenues JSONB to flat form values
                 const formValues: Record<string, any> = {
                     month: initialData.month,
+                    netProfit: initialData.netProfit || 0,
                     ...initialData.revenues, // Map "mercadolivre": 100 directly
                 };
                 // Ensure all current marketplaces have a value, even if 0 (handling new ones added after record creation)
@@ -79,6 +81,7 @@ export const ClosingFormDialog = ({
                 // Init empty
                 const defaultValues: Record<string, any> = {
                     month: new Date().toISOString().slice(0, 7),
+                    netProfit: 0,
                 };
                 marketplaces.forEach(m => {
                     defaultValues[m.id] = 0;
@@ -99,6 +102,7 @@ export const ClosingFormDialog = ({
         onSave({
             month: values.month,
             revenues,
+            netProfit: Number(values.netProfit || 0),
         });
         onOpenChange(false);
     };
@@ -145,6 +149,31 @@ export const ClosingFormDialog = ({
                                                     {...field}
                                                 />
                                                 <Calendar className="absolute left-3 top-3 h-5 w-5 text-gray-500 group-hover:text-green-500 transition-colors pointer-events-none" />
+                                            </div>
+                                        </FormControl>
+                                        <FormMessage />
+                                    </FormItem>
+                                )}
+                            />
+
+                            <FormField
+                                control={form.control}
+                                name="netProfit"
+                                render={({ field }) => (
+                                    <FormItem className="space-y-1.5 p-4 rounded-xl bg-gradient-to-r from-emerald-500/10 to-transparent border border-emerald-500/20">
+                                        <FormLabel className="text-sm font-bold text-emerald-400">
+                                            Lucro Líquido / Repasse do Mês
+                                        </FormLabel>
+                                        <FormControl>
+                                            <div className="relative">
+                                                <Input
+                                                    type="number"
+                                                    step="0.01"
+                                                    className="pl-10 h-11 bg-[#0A0A0A] border-emerald-500/30 text-emerald-400 font-bold focus:border-emerald-500 rounded-lg text-right pr-4 text-lg"
+                                                    placeholder="0,00"
+                                                    {...field}
+                                                />
+                                                <DollarSign className="absolute left-3 top-3.5 h-4 w-4 text-emerald-500" />
                                             </div>
                                         </FormControl>
                                         <FormMessage />

@@ -56,13 +56,13 @@ const chartConfig = {
 const renderUpcomingItem = (installment: InstallmentWithRelations) => (
   <div
     key={installment.id}
-    className="flex items-center justify-between gap-4 p-3 bg-muted/50 rounded-lg"
+    className="flex items-center justify-between gap-4 p-4 bg-[#111111]/80 backdrop-blur-sm border border-white/5 rounded-xl hover:border-white/10 transition-colors group"
   >
     <div className="flex-1">
-      <p className="font-medium text-sm">
+      <p className="font-medium text-white text-sm tracking-wide">
         {installment.supplier?.name ?? "Fornecedor não informado"}
       </p>
-      <p className="text-xs text-muted-foreground">
+      <p className="text-xs text-gray-500 font-bold uppercase tracking-widest mt-1">
         Pedido {installment.order?.order_number ?? "-"} •{" "}
         {installment.installment_number === 0
           ? "Entrada"
@@ -70,16 +70,13 @@ const renderUpcomingItem = (installment: InstallmentWithRelations) => (
       </p>
     </div>
     <div className="text-right">
-      <p className="font-semibold text-sm">
+      <p className="font-light text-white text-lg tracking-tight">
         {formatCurrencyBRL(installment.value)}
       </p>
-      <p className="text-xs text-muted-foreground">
-        {format(parseISO(installment.due_date), "dd/MM/yyyy")}
+      <p className="text-[10px] text-gray-500 font-bold uppercase tracking-widest mt-1">
+        Vence em {format(parseISO(installment.due_date), "dd/MM")}
       </p>
     </div>
-    <Badge variant={getStatusVariant(installment.status)}>
-      {statusLabels[installment.status]}
-    </Badge>
   </div>
 );
 
@@ -195,37 +192,41 @@ const Dashboard = () => {
 
   const insightToneStyles: Record<
     "warning" | "info" | "success",
-    { container: string; title: string; description: string }
+    { container: string; title: string; description: string; button: string }
   > = {
     warning: {
-      container: "border-amber-200 bg-amber-50 dark:border-amber-300 dark:bg-amber-500/20",
-      title: "text-amber-900 dark:text-amber-100",
-      description: "text-amber-700 dark:text-amber-200",
+      container: "bg-red-900/10 backdrop-blur-sm border border-red-500/20 hover:border-red-500/40 shadow-[0_0_15px_rgba(239,68,68,0.05)]",
+      title: "text-red-500",
+      description: "text-red-400/80",
+      button: "bg-red-500/10 text-red-500 hover:bg-red-500/20 border-red-500/20",
     },
     info: {
-      container: "border-primary/30 bg-primary/10 dark:border-primary/50 dark:bg-primary/20",
-      title: "text-primary dark:text-primary-foreground",
-      description: "text-primary/80 dark:text-primary-foreground dark:opacity-80",
+      container: "bg-[#111111]/80 backdrop-blur-sm border border-white/10 hover:border-white/20",
+      title: "text-white",
+      description: "text-gray-400",
+      button: "bg-white/5 text-white hover:bg-white/10 border-white/10 text-xs",
     },
     success: {
-      container: "border-emerald-200 bg-emerald-50 dark:border-emerald-400 dark:bg-emerald-500/20",
-      title: "text-emerald-900 dark:text-emerald-100",
-      description: "text-emerald-700 dark:text-emerald-200",
+      container: "bg-emerald-900/10 backdrop-blur-sm border-t border-emerald-500/30 border-x-emerald-500/10 border-b-emerald-500/10 shadow-[0_0_15px_rgba(16,185,129,0.05)] hover:border-emerald-500/40",
+      title: "text-[#00FF00]",
+      description: "text-emerald-400/80",
+      button: "bg-[#00FF00]/10 text-[#00FF00] hover:bg-[#00FF00]/20 border-[#00FF00]/20 text-xs",
     },
   };
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-8 animate-in fade-in duration-700 pb-10">
       <OnboardingChecklist />
-      <div className="flex justify-between items-center">
+      
+      <div className="flex flex-col md:flex-row justify-between md:items-end gap-4 mb-2">
         <div>
-          <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-          <p className="text-muted-foreground mt-1">
+          <h1 className="text-4xl font-light text-white tracking-tight leading-none mb-2">Dashboard</h1>
+          <p className="text-gray-500 font-medium text-sm tracking-wide uppercase">
             Visão geral das suas finanças
           </p>
         </div>
         <Button
-          className="bg-accent hover:bg-accent/90 text-accent-foreground"
+          className="bg-[#00FF00] hover:bg-[#00FF00]/80 text-black font-bold shadow-[0_0_15px_rgba(0,255,0,0.3)] rounded-lg px-6 transition-all"
           onClick={() => dispatchAppEvent(OPEN_ORDER_DIALOG_EVENT)}
         >
           <Plus className="h-4 w-4 mr-2" />
@@ -233,42 +234,44 @@ const Dashboard = () => {
         </Button>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-6">
+      {/* Métricas Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 2xl:grid-cols-6 gap-4">
         {metrics.map((metric) => (
-          <Card key={metric.title} className="hover-scale card-shadow">
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
-              <CardTitle className="text-sm font-medium text-muted-foreground">
-                {metric.title}
-              </CardTitle>
-              <metric.icon className={`h-5 w-5 ${metric.color}`} />
-            </CardHeader>
-            <CardContent>
+          <div key={metric.title} className="bg-[#111111]/80 backdrop-blur-sm border border-white/5 rounded-2xl p-5 flex flex-col justify-between hover:border-white/10 transition-colors group">
+            <div className="flex items-center justify-between mb-6">
+              <p className="text-gray-500 text-[9px] uppercase tracking-widest font-bold line-clamp-1">{metric.title}</p>
+              <metric.icon className={`h-4 w-4 ${metric.color} opacity-70 group-hover:opacity-100 transition-opacity`} />
+            </div>
+            <div>
               {isLoading ? (
-                <Skeleton className="h-8 w-24" />
+                <Skeleton className="h-8 w-24 bg-white/5" />
               ) : metric.value !== null ? (
-                <div className="text-2xl font-bold">{metric.value}</div>
+                <div className={`text-3xl font-light tracking-tighter ${metric.title.includes('Vencidas') && Number(metric.value) > 0 ? 'text-red-500' : 'text-white'}`}>
+                  {metric.value}
+                </div>
               ) : (
-                <div className="text-sm text-muted-foreground">
-                  Erro ao carregar métricas.
+                <div className="text-xs text-gray-500">
+                  Erro ao carregar.
                 </div>
               )}
-            </CardContent>
-          </Card>
+            </div>
+          </div>
         ))}
       </div>
 
-      <Card className="card-shadow">
-        <CardHeader className="pb-3">
-          <CardTitle>Prioridades do dia</CardTitle>
-          <CardDescription>
+      {/* Prioridades do Dia */}
+      <div className="bg-[#111111]/60 backdrop-blur-md border border-white/5 rounded-2xl p-6">
+        <div className="mb-6">
+          <h2 className="text-xl font-light text-white tracking-tight mb-1">Prioridades do dia</h2>
+          <p className="text-gray-500 text-sm font-medium">
             Foque nas ações que mantêm o caixa saudável e o relacionamento com fornecedores em dia.
-          </CardDescription>
-        </CardHeader>
-        <CardContent className="space-y-3">
+          </p>
+        </div>
+        <div className="space-y-3">
           {isLoading ? (
             <div className="space-y-3">
               {Array.from({ length: 3 }).map((_, index) => (
-                <Skeleton key={index} className="h-16 w-full" />
+                <Skeleton key={index} className="h-20 w-full bg-white/5 rounded-xl" />
               ))}
             </div>
           ) : insights.length > 0 ? (
@@ -278,17 +281,19 @@ const Dashboard = () => {
                 <div
                   key={insight.id}
                   className={cn(
-                    "flex flex-col gap-3 rounded-lg border p-4 md:flex-row md:items-center md:justify-between",
+                    "flex flex-col gap-3 rounded-xl p-5 md:flex-row md:items-center md:justify-between transition-colors",
                     insightToneStyles[tone].container,
                   )}
                 >
                   <div className="space-y-1">
                     <p
                       className={cn(
-                        "font-medium text-sm md:text-base",
+                        "font-medium text-base tracking-wide flex items-center gap-2",
                         insightToneStyles[tone].title,
                       )}
                     >
+                      {tone === 'success' && <span className="w-1.5 h-1.5 rounded-full bg-[#00FF00] animate-pulse" />}
+                      {tone === 'warning' && <span className="w-1.5 h-1.5 rounded-full bg-red-500 animate-pulse" />}
                       {insight.title}
                     </p>
                     <p
@@ -301,7 +306,7 @@ const Dashboard = () => {
                     </p>
                   </div>
                   {insight.onAction ? (
-                    <Button size="sm" variant="secondary" onClick={insight.onAction}>
+                    <Button size="sm" className={cn("font-bold border tracking-wide", insightToneStyles[tone].button)} onClick={insight.onAction}>
                       {insight.actionLabel ?? "Ver detalhes"}
                     </Button>
                   ) : null}
@@ -309,21 +314,22 @@ const Dashboard = () => {
               );
             })
           ) : (
-            <p className="text-sm text-muted-foreground">
+            <p className="text-sm text-gray-500">
               Não foi possível carregar as prioridades agora. Atualize a página ou tente novamente mais tarde.
             </p>
           )}
-        </CardContent>
-      </Card>
+        </div>
+      </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-        <Card className="card-shadow">
-          <CardHeader>
-            <CardTitle>Variáveis vs Fixas (Próximas Semanas)</CardTitle>
-          </CardHeader>
-          <CardContent>
+        {/* Gráfico */}
+        <div className="bg-[#111111]/80 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex flex-col">
+          <div className="mb-6">
+            <h2 className="text-xl font-light text-white tracking-tight">Variáveis vs Fixas (Próximas Semanas)</h2>
+          </div>
+          <div className="flex-1">
             {isLoading ? (
-              <Skeleton className="h-64 w-full" />
+              <Skeleton className="h-64 w-full bg-white/5 rounded-xl" />
             ) : chartHasData ? (
               <>
                 <ChartContainer config={chartConfig} className="h-64 w-full">
@@ -396,18 +402,18 @@ const Dashboard = () => {
                 }
               />
             )}
-          </CardContent>
-        </Card>
-
-        <Card className="card-shadow">
-          <CardHeader>
-            <CardTitle>Próximos Vencimentos</CardTitle>
-          </CardHeader>
-          <CardContent>
+          </div>
+        </div>
+        {/* Próximos Vencimentos */}
+        <div className="bg-[#111111]/80 backdrop-blur-sm border border-white/5 rounded-2xl p-6 flex flex-col">
+          <div className="mb-6">
+            <h2 className="text-xl font-light text-white tracking-tight">Próximos Vencimentos</h2>
+          </div>
+          <div className="flex-1">
             {isLoading ? (
               <div className="space-y-3">
                 {Array.from({ length: 4 }).map((_, index) => (
-                  <Skeleton key={index} className="h-16 w-full" />
+                  <Skeleton key={index} className="h-16 w-full bg-white/5 rounded-xl" />
                 ))}
               </div>
             ) : data && data.upcomingInstallments.length > 0 ? (
@@ -421,8 +427,8 @@ const Dashboard = () => {
                 description="As parcelas aparecerão aqui quando estiverem próximas do vencimento."
               />
             )}
-          </CardContent>
-        </Card>
+          </div>
+        </div>
       </div>
 
       {isError ? (

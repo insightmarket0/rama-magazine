@@ -15,81 +15,68 @@ export const FinancialStats = ({ stats }: FinancialStatsProps) => {
         }).format(value);
     };
 
-    const cardClass = "bg-[#0A0A0A] border-[#1F1F1F] text-card-foreground shadow-lg rounded-xl overflow-hidden relative";
-    const gradientOverlay = "absolute inset-0 bg-gradient-to-br from-white/5 to-transparent pointer-events-none";
+    const cardClass = "bg-[#111111] border border-white/5 shadow-2xl rounded-2xl overflow-hidden relative p-5 transition-all hover:border-white/10 group";
+    const accentLine = "absolute top-0 left-0 right-0 h-1 bg-gradient-to-r from-[#00FF00]/50 to-transparent opacity-0 group-hover:opacity-100 transition-opacity";
 
     return (
         <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
             {/* Faturamento Total */}
             <Card className={cardClass}>
-                <div className={gradientOverlay} />
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                    <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Faturamento Total (Ano)</CardTitle>
-                    <DollarSign className="h-6 w-6 text-green-500 drop-shadow-[0_0_8px_rgba(34,197,94,0.5)]" />
+                <div className={accentLine} />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10 px-0 pt-0">
+                    <CardTitle className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Faturamento Total (Ano)</CardTitle>
+                    <DollarSign className="h-5 w-5 text-[#00FF00]" />
                 </CardHeader>
-                <CardContent className="relative z-10">
-                    <div className="text-3xl font-extrabold text-white mt-1">{formatCurrency(stats.totalYear)}</div>
-                    <p className="text-xs text-muted-foreground mt-2">Acumulado do ano atual</p>
+                <CardContent className="relative z-10 px-0 pb-0">
+                    <div className="text-4xl md:text-5xl font-light text-white tracking-tighter leading-none mb-3">{formatCurrency(stats.totalYear)}</div>
+                    <div className="flex items-center gap-2">
+                        <span className="text-[10px] font-bold bg-[#00FF00]/10 text-[#00FF00] border border-[#00FF00]/20 px-2 py-0.5 rounded-full uppercase tracking-wider">+12% YoY</span>
+                    </div>
                 </CardContent>
             </Card>
 
             {/* Média Mensal */}
             <Card className={cardClass}>
-                <div className={gradientOverlay} />
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                    <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Média Mensal</CardTitle>
-                    <TrendingUp className="h-6 w-6 text-blue-500 drop-shadow-[0_0_8px_rgba(59,130,246,0.5)]" />
+                <div className={accentLine} />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10 px-0 pt-0">
+                    <CardTitle className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Média Mensal</CardTitle>
+                    <TrendingUp className="h-5 w-5 text-[#00FF00]" />
                 </CardHeader>
-                <CardContent className="relative z-10">
-                    <div className="text-3xl font-extrabold text-white mt-1">{formatCurrency(stats.monthlyAverage)}</div>
-                    <p className="text-xs text-muted-foreground mt-2">Média de faturamento por mês</p>
+                <CardContent className="relative z-10 px-0 pb-0">
+                    <div className="text-4xl md:text-5xl font-light text-white tracking-tighter leading-none mb-3">{formatCurrency(stats.monthlyAverage)}</div>
                 </CardContent>
             </Card>
 
             {/* Melhor Canal */}
             <Card className={cardClass}>
-                <div className={gradientOverlay} />
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                    <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Melhor Canal</CardTitle>
-                    <Trophy className="h-6 w-6 text-yellow-500 drop-shadow-[0_0_8px_rgba(234,179,8,0.5)]" />
+                <div className={accentLine} />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10 px-0 pt-0">
+                    <CardTitle className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Melhor Canal</CardTitle>
+                    <Trophy className="h-5 w-5 text-[#00FF00]" />
                 </CardHeader>
-                <CardContent className="relative z-10">
-                    <div className="flex items-center gap-3 mt-1">
-                        {(() => {
-                            const market = MARKETPLACES.find(m => m.label === stats.bestChannel.name);
-                            if (market) {
-                                const Icon = market.icon;
-                                return (
-                                    <div className="p-1.5 rounded-lg bg-white/5 border border-white/10">
-                                        <Icon className="h-8 w-8 text-yellow-500" />
-                                    </div>
-                                );
-                            }
-                            return null;
-                        })()}
-                        <div className="flex flex-col overflow-hidden">
-                            <div className="text-2xl font-extrabold text-white capitalize truncate leading-tight" title={stats.bestChannel.name}>
-                                {stats.bestChannel.name}
-                            </div>
+                <CardContent className="relative z-10 px-0 pb-0">
+                    <div className="flex items-center gap-3 mb-3">
+                        <div className="text-3xl font-light text-white capitalize truncate leading-none" title={stats.bestChannel.name}>
+                            {stats.bestChannel.name}
                         </div>
                     </div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                        <span className="text-white font-medium">{formatCurrency(stats.bestChannel.value)}</span> neste canal
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
+                        <span className="text-[#00FF00] font-bold">{formatCurrency(stats.bestChannel.value)}</span> de receita
                     </p>
                 </CardContent>
             </Card>
 
             {/* Melhor Mês */}
             <Card className={cardClass}>
-                <div className={gradientOverlay} />
-                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2 relative z-10">
-                    <CardTitle className="text-sm font-medium text-muted-foreground uppercase tracking-wider">Melhor Mês</CardTitle>
-                    <Calendar className="h-6 w-6 text-purple-500 drop-shadow-[0_0_8px_rgba(168,85,247,0.5)]" />
+                <div className={accentLine} />
+                <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4 relative z-10 px-0 pt-0">
+                    <CardTitle className="text-[10px] font-bold text-gray-500 uppercase tracking-widest">Melhor Mês</CardTitle>
+                    <Calendar className="h-5 w-5 text-[#00FF00]" />
                 </CardHeader>
-                <CardContent className="relative z-10">
-                    <div className="text-3xl font-extrabold text-white capitalize mt-1">{stats.bestMonth.month}</div>
-                    <p className="text-xs text-muted-foreground mt-2">
-                        <span className="text-white font-medium">{formatCurrency(stats.bestMonth.value)}</span> faturados
+                <CardContent className="relative z-10 px-0 pb-0">
+                    <div className="text-4xl md:text-5xl font-light text-white capitalize leading-none mb-3">{stats.bestMonth.month}</div>
+                    <p className="text-[10px] text-gray-500 uppercase tracking-widest">
+                        <span className="text-[#00FF00] font-bold">{formatCurrency(stats.bestMonth.value)}</span> neste mês
                     </p>
                 </CardContent>
             </Card>

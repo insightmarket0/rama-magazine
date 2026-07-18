@@ -1,4 +1,3 @@
-import { SidebarProvider, SidebarTrigger } from "@/components/ui/sidebar";
 import { AppSidebar } from "./AppSidebar";
 import { ThemeToggle } from "./ThemeToggle";
 import { GlobalDialogs } from "./GlobalDialogs";
@@ -10,15 +9,26 @@ import { useCallback, useEffect, useMemo, useState } from "react";
 import { useAuth } from "@/hooks/useAuth";
 import { supabase } from "@/integrations/supabase/client";
 import { Avatar, AvatarImage, AvatarFallback } from "@/components/ui/avatar";
-
+import { useLocation } from "react-router-dom";
+import { ChevronDown, Bell, User as UserIcon, Settings } from "lucide-react";
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 interface MainLayoutProps {
   children: React.ReactNode;
 }
 
 export function MainLayout({ children }: MainLayoutProps) {
-  const { user } = useAuth();
+  const { user, signOut } = useAuth();
   const [fullName, setFullName] = useState<string | null>(null);
+  const [role, setRole] = useState<string | null>(null);
   const [visible, setVisible] = useState(false);
+  const location = useLocation();
+  const isHomePage = location.pathname === "/meu-dia" || location.pathname === "/";
 
   const safeMetadata = useMemo<Record<string, unknown>>(() => {
     if (user?.user_metadata && typeof user.user_metadata === "object" && !Array.isArray(user.user_metadata)) {
@@ -47,16 +57,18 @@ export function MainLayout({ children }: MainLayoutProps) {
       try {
         const { data, error } = await supabase
           .from("profiles")
-          .select("full_name")
+          .select("full_name, role")
           .eq("user_id", user.id)
           .single();
 
         if (!mounted) return;
 
         const metadataFullName = metadataString("full_name");
+        const metadataRole = metadataString("role");
 
         if (error) {
           setFullName(metadataFullName ?? null);
+          setRole(metadataRole ?? null);
           return;
         }
 
@@ -64,9 +76,17 @@ export function MainLayout({ children }: MainLayoutProps) {
           data && typeof data === "object" && "full_name" in data && typeof (data as Record<string, unknown>).full_name === "string"
             ? ((data as Record<string, unknown>).full_name as string)
             : undefined;
+            
+        const dbRole =
+          data && typeof data === "object" && "role" in data && typeof (data as Record<string, unknown>).role === "string"
+            ? ((data as Record<string, unknown>).role as string)
+            : undefined;
+
         setFullName(dbFullName ?? metadataFullName ?? null);
+        setRole(dbRole ?? metadataRole ?? null);
       } catch {
         setFullName(metadataString("full_name") ?? null);
+        setRole(metadataString("role") ?? null);
       }
     };
 
@@ -101,40 +121,66 @@ export function MainLayout({ children }: MainLayoutProps) {
   const avatarUrl = metadataString("avatar_url");
 
   return (
-    <SidebarProvider>
+    <>
       <GlobalDialogs />
       <GlobalShortcuts />
-      <div className="flex min-h-screen w-full">
+      <div className="flex min-h-screen w-full bg-background pl-24">
         <AppSidebar />
         <div className="flex flex-1 flex-col">
-          <header className="sticky top-0 z-10 flex h-16 items-center border-b bg-card px-6">
-            <div className="flex w-full items-center gap-3">
-              <SidebarTrigger />
-              {/* Greeting */}
-              <div className="ml-4 hidden sm:flex items-center">
-                <div className={`flex items-center gap-3 transition-all duration-300 ease-out ${
-                  visible ? 'opacity-100 translate-y-0' : 'opacity-0 -translate-y-1'
-                }`}>
-                  <Avatar>
-                    { avatarUrl ? (
-                      <AvatarImage src={avatarUrl} alt={fullName ?? undefined} />
-                    ) : (
-                      <AvatarFallback>{initials()}</AvatarFallback>
-                    )}
-                  </Avatar>
-                  <div className="leading-tight">
-                    <div className="text-xs text-muted-foreground">{greeting()},</div>
-                    <div className="text-sm font-semibold text-foreground">{fullName ?? user?.email?.split('@')[0] ?? 'Usuário'}</div>
-                  </div>
-                </div>
-              </div>
-              <div className="ml-auto flex items-center gap-2">
-                <QuickCreateMenu />
-                <CommandMenu />
-                <ThemeToggle />
-              </div>
+          {/* Header Condicional (Só no Início) - Flutuante para não empurrar o layout */}
+          {isHomePage && (
+            <div className="absolute top-6 left-32 z-50 flex items-center gap-4">
+              {/* Pill de Notificações */}
+                  <button className="flex items-center gap-3 bg-[#1C1C1E] hover:bg-[#252528] transition-colors border border-white/5 rounded-full px-4 py-2.5 shadow-lg">
+                    <div className="relative">
+                      <Bell className="h-4 w-4 text-gray-400" />
+                    </div>
+                    <span className="text-sm text-gray-400 font-medium">Notifications</span>
+                    <div className="h-5 w-5 bg-[#FF5C5C] rounded-full flex items-center justify-center text-[10px] font-bold text-white shadow-sm">
+                      6
+                    </div>
+                  </button>
+
+                  {/* Pill do Perfil */}
+                  <DropdownMenu>
+                    <DropdownMenuTrigger asChild>
+                      <button className="flex items-center gap-4 bg-[#1C1C1E] hover:bg-[#252528] transition-colors border border-white/5 rounded-full pl-2 pr-4 py-2 shadow-lg group cursor-pointer outline-none">
+                        <Avatar className="h-10 w-10 border-none ring-0">
+                          { avatarUrl ? (
+                            <AvatarImage src={avatarUrl} alt={fullName ?? undefined} />
+                          ) : (
+                            <AvatarFallback className="bg-[#FFB703] text-black font-bold text-sm">
+                              {initials()}
+                            </AvatarFallback>
+                          )}
+                        </Avatar>
+                        
+                        <div className="flex flex-col items-start justify-center pr-2 text-left">
+                          <span className="text-[10px] font-bold text-gray-400 tracking-wider uppercase mb-0.5">
+                            {role ?? "Membro"}
+                          </span>
+                          <span className="text-sm font-semibold text-white tracking-wide leading-tight truncate max-w-[150px]">
+                            {fullName ?? user?.email?.split('@')[0] ?? 'Fahema Yesmin'}
+                          </span>
+                        </div>
+
+                        <ChevronDown className="h-4 w-4 text-gray-500 group-hover:text-white transition-colors ml-2" />
+                      </button>
+                    </DropdownMenuTrigger>
+                    
+                    <DropdownMenuContent align="end" className="w-56 bg-[#1C1C1E] border-white/10 text-white rounded-xl shadow-2xl p-2 z-[60]">
+                      <DropdownMenuItem className="focus:bg-[#252528] focus:text-white cursor-pointer rounded-lg py-2.5">
+                        <UserIcon className="mr-2 h-4 w-4 text-gray-400" />
+                        <span>Meu Perfil</span>
+                      </DropdownMenuItem>
+                      <DropdownMenuItem className="focus:bg-[#252528] focus:text-white cursor-pointer rounded-lg py-2.5">
+                        <Settings className="mr-2 h-4 w-4 text-gray-400" />
+                        <span>Configurações</span>
+                      </DropdownMenuItem>
+                    </DropdownMenuContent>
+                  </DropdownMenu>
             </div>
-          </header>
+          )}
           <main className="flex-1 p-6">
             <div className="space-y-6">
               <GlobalAlerts />
@@ -143,6 +189,6 @@ export function MainLayout({ children }: MainLayoutProps) {
           </main>
         </div>
       </div>
-    </SidebarProvider>
+    </>
   );
 }

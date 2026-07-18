@@ -131,4 +131,13 @@ All colors MUST be HSL.
   .card-shadow-lg {
     box-shadow: var(--shadow-lg);
   }
+
+  .animate-marquee-vertical {
+    animation: marquee-vertical 20s linear infinite;
+  }
+}
+
+@keyframes marquee-vertical {
+  from { transform: translateY(0); }
+  to { transform: translateY(-50%); }
 }

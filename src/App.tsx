@@ -10,6 +10,14 @@ import { ProtectedRoute } from "./components/layout/ProtectedRoute";
 
 const DashboardFinanceiro = lazy(() => import("./pages/DashboardFinanceiro"));
 const Dashboard = lazy(() => import("./pages/Dashboard"));
+const MeuDia = lazy(() => import("./pages/MeuDia"));
+const Ecossistema = lazy(() => import("./pages/Ecossistema"));
+const RankingEquipe = lazy(() => import("./pages/RankingEquipe"));
+const Metas = lazy(() => import("./pages/Metas"));
+const MuralAlinhamento = lazy(() => import("./pages/MuralAlinhamento"));
+const Lembretes = lazy(() => import("./pages/Lembretes"));
+const MuralAjustes = lazy(() => import("./pages/MuralAjustes"));
+const Playbooks = lazy(() => import("./pages/Playbooks"));
 const Pedidos = lazy(() => import("./pages/Pedidos"));
 const Condicoes = lazy(() => import("./pages/Condicoes"));
 const Contas = lazy(() => import("./pages/Contas"));
@@ -20,6 +28,7 @@ const QuotationForm = lazy(() => import("./pages/QuotationForm"));
 const QuotationDetail = lazy(() => import("./pages/QuotationDetail"));
 const Auth = lazy(() => import("./pages/Auth"));
 const NotFound = lazy(() => import("./pages/NotFound"));
+const ChatPage = lazy(() => import("./pages/Chat"));
 
 const queryClient = new QueryClient();
 
@@ -58,6 +67,96 @@ const App = () => (
                 <ProtectedRoute>
                   <MainLayout>
                     <Dashboard />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/meu-dia"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <MeuDia />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ecossistema"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Ecossistema />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/playbooks"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Playbooks />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/metas"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Metas />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mural-alinhamento"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <MuralAlinhamento />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/lembretes"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <Lembretes />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/mural-ajustes"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <MuralAjustes />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/ranking-equipe"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <RankingEquipe />
+                  </MainLayout>
+                </ProtectedRoute>
+              }
+            />
+            <Route
+              path="/chat"
+              element={
+                <ProtectedRoute>
+                  <MainLayout>
+                    <ChatPage />
                   </MainLayout>
                 </ProtectedRoute>
               }

@@ -27,6 +27,7 @@ export const MarketplaceShareChart = ({ data }: MarketplaceShareChartProps) => {
         return {
             data: marketplaces.map(market => ({
                 name: market.label,
+                id: market.id, // we need id for pastel mapping
                 value: totals[market.id] || 0,
                 color: market.color
             })).filter(item => item.value > 0),
@@ -43,22 +44,34 @@ export const MarketplaceShareChart = ({ data }: MarketplaceShareChartProps) => {
         }).format(value);
     };
 
+    const formatTooltip = (value: number) => {
+        return new Intl.NumberFormat("pt-BR", { style: "currency", currency: "BRL" }).format(value);
+    };
+
+    // Mapeamento de cores pastel para a rosca
+    const pastelColors: Record<string, string> = {
+        mercadolivre: "#FDE047", // Yellow 300
+        shopee: "#FB923C", // Orange 400
+        amazon: "#7DD3FC", // Sky 300
+        magalu: "#60A5FA", // Blue 400
+    };
+
     return (
-        <Card className="col-span-3 bg-[#0A0A0A] border-[#1F1F1F] shadow-lg rounded-xl">
-            <CardHeader>
-                <CardTitle className="text-xl font-bold text-white">Share por Marketplace</CardTitle>
+        <Card className="col-span-3 bg-[#111111] border border-white/5 shadow-2xl rounded-2xl p-2 transition-all hover:border-white/10 group relative overflow-hidden">
+            <CardHeader className="px-6 pt-6">
+                <CardTitle className="text-[10px] font-bold text-gray-500 uppercase tracking-widest mb-2">Share por Marketplace</CardTitle>
             </CardHeader>
-            <CardContent>
-                <div className="h-[300px] w-full relative">
+            <CardContent className="px-6 pb-6">
+                <div className="h-[280px] w-full relative">
                     <ResponsiveContainer width="100%" height="100%">
                         <PieChart>
                             <Pie
                                 data={chartData.data}
                                 cx="50%"
                                 cy="50%"
-                                innerRadius={75}
-                                outerRadius={95}
-                                paddingAngle={2}
+                                innerRadius={80}
+                                outerRadius={110}
+                                paddingAngle={5}
                                 dataKey="value"
                                 stroke="none"
                                 label={({ cx, cy, midAngle, innerRadius, outerRadius, percent, index }) => {
@@ -86,18 +99,18 @@ export const MarketplaceShareChart = ({ data }: MarketplaceShareChartProps) => {
                                 }}
                             >
                                 {chartData.data.map((entry, index) => (
-                                    <Cell key={`cell-${index}`} fill={entry.color} />
+                                    <Cell key={`cell-${index}`} fill={pastelColors[entry.id as string] || entry.color} />
                                 ))}
                             </Pie>
                             <Tooltip
-                                formatter={(value: number) => formatCurrency(value)}
+                                formatter={(value: number) => formatTooltip(value)}
                                 contentStyle={{
-                                    backgroundColor: "#121212",
-                                    borderColor: "#333",
+                                    backgroundColor: "#1C1C1E",
+                                    borderColor: "rgba(255,255,255,0.1)",
                                     borderRadius: "12px",
-                                    color: "#fff"
+                                    color: "#E5E7EB"
                                 }}
-                                itemStyle={{ color: "#fff" }}
+                                itemStyle={{ color: "#E5E7EB" }}
                             />
                             <Legend
                                 verticalAlign="bottom"

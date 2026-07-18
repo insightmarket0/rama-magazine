@@ -30,13 +30,18 @@ export const useFinancialClosings = () => {
         }
 
         return (data as any[]).map((row: FinancialClosingRow) => {
-            // Calculate total from all keys in revenues object
-            const total = Object.values(row.revenues || {}).reduce((sum, val) => sum + (Number(val) || 0), 0);
+            const cleanRevenues = { ...row.revenues };
+            const netProfit = cleanRevenues['_net_profit'] || 0;
+            delete cleanRevenues['_net_profit'];
+
+            // Calculate total only from actual marketplace revenues
+            const total = Object.values(cleanRevenues).reduce((sum, val) => sum + (Number(val) || 0), 0);
 
             return {
                 id: row.id,
                 month: row.month,
-                revenues: row.revenues,
+                revenues: cleanRevenues,
+                netProfit,
                 total,
             };
         });
@@ -52,10 +57,12 @@ export const useFinancialClosings = () => {
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error("Usuário não autenticado");
 
+            const dbRevenues = { ...newClosing.revenues, _net_profit: newClosing.netProfit || 0 };
+
             const { error } = await supabase.from("financial_closings").insert({
                 user_id: user.id,
                 month: newClosing.month,
-                revenues: newClosing.revenues, // Insert JSONB directly
+                revenues: dbRevenues, // Insert JSONB directly
             });
 
             if (error) throw error;
@@ -93,11 +100,13 @@ export const useFinancialClosings = () => {
 
     const updateClosing = useMutation({
         mutationFn: async (data: MonthlyClosing) => {
+            const dbRevenues = { ...data.revenues, _net_profit: data.netProfit || 0 };
+
             const { error } = await supabase
                 .from("financial_closings")
                 .update({
                     month: data.month,
-                    revenues: data.revenues,
+                    revenues: dbRevenues,
                 } as any)
                 .eq("id", data.id);
 
